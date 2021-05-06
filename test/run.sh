@@ -17,4 +17,6 @@ docker run \
     $name \
         py.test \
         --tb=short \
+        -s \
+        -v \
         "$@"

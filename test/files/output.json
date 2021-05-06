@@ -1,0 +1,12 @@
+{
+    "defaults_vcl_backend":{
+       "sensitive":false,
+       "type":"string",
+       "value":" backend ${backend_name} {\n            .connect_timeout = ${connect_timeout};\n            .dynamic = ${dynamic};\n            .first_byte_timeout = ${first_byte_timeout};\n            .between_bytes_timeout = ${between_bytes_timeout};\n            .max_connections = ${max_connections};\n            .port = \"${backend_port}\";\n            .host = \"${backend_host}\";\n\n            .ssl = true;\n            ${ssl_sni_hostname_section}\n            .ssl_cert_hostname = \"${ssl_cert_hostname}\";\n            ${ssl_ca_cert_section}\n            .ssl_check_cert = ${ssl_check_cert};\n            .probe = {\n                .request = \"HEAD ${healthcheck_path} HTTP/1.1\" \"Connection: close\";\n                .window = ${probe_window};\n                .threshold = ${probe_threshold};\n                .timeout = ${probe_timeout};\n                .initial = ${probe_initial};\n                .interval = ${probe_interval};\n                ${dummy}\n            }\n        }"
+    },
+    "defaults_vcl_recv":{
+       "sensitive":false,
+       "type":"string",
+       "value":"if (req.backend == F_default_backend && (${vcl_recv_condition})) {\n    set req.backend = ${backend_name};\n    set req.http.Date = now;\n    set req.http.host = \"${host_header}\";\n    set req.http.Authorization = \"AWS ${aws_access_key_id}:\" digest.hmac_sha1_base64(\"${aws_secret_access_key}\", if(req.request == \"HEAD\", \"GET\", req.request) LF LF LF req.http.Date LF \"/${s3_bucket_name}\" req.url.path);\n}"
+    }
+ }

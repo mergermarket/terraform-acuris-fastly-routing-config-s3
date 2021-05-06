@@ -4,7 +4,7 @@ variable "vcl_recv_condition" {
 }
 
 variable "backend_name" {
-  description = "Identifier for the backend/"
+  description = "Identifier for the backend"
   type        = string
 }
 
